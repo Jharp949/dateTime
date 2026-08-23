@@ -30,7 +30,7 @@
 			backdrop-filter: blur(10px);
 			-webkit-backdrop-filter: blur(10px);
 			min-height: 200px;
-			max-height: 230px;
+			max-height: 225px;
 			min-width: 355px;
 			max-width: 375px;
 		}
@@ -61,6 +61,23 @@
 		.fc-name { font-size: 0.72rem; font-weight: 700; color: #cbd5e1; }
 		.fc-icon { font-size: 1.1rem; line-height: 1.5; }
 		.fc-temps { font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
+
+		.aqi-uv {
+			margin-top: 6px;
+			padding-top: 6px;
+			border-top: 1px solid rgba(255,255,255,0.1);
+		}
+		.stat-row { display: flex; gap: 6px; }
+		.stat-box {
+			flex: 1;
+			background: rgba(255,255,255,0.06);
+			border-radius: 8px;
+			padding: 5px 8px;
+			text-align: center;
+		}
+		.stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; }
+		.stat-value { font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
+		.stat-desc { font-size: 0.65rem; margin-top: 1px; color: #94a3b8; }
 	</style>
 </head>
 <body>
@@ -81,6 +98,21 @@
 			<div class="weather-label" id="weatherLabel">Loading forecast…</div>
 			<div class="forecast-row" id="forecastRow"></div>
 		</div>
+
+		<div class="aqi-uv">
+			<div class="stat-row">
+				<div class="stat-box">
+					<div class="stat-label">AQI</div>
+					<div class="stat-value" id="aqiValue">--</div>
+					<div class="stat-desc" id="aqiDesc">--</div>
+				</div>
+				<div class="stat-box">
+					<div class="stat-label">UV Index</div>
+					<div class="stat-value" id="uvValue">--</div>
+					<div class="stat-desc" id="uvDesc">--</div>
+				</div>
+			</div>
+		</div>
 	</aside>
 
 	<script>
@@ -88,6 +120,10 @@
 		const timeDisplay = document.getElementById('timeDisplay');
 		const forecastRow  = document.getElementById('forecastRow');
 		const weatherLabel = document.getElementById('weatherLabel');
+		const aqiValue     = document.getElementById('aqiValue');
+		const aqiDesc      = document.getElementById('aqiDesc');
+		const uvValue      = document.getElementById('uvValue');
+		const uvDesc       = document.getElementById('uvDesc');
 
 		const dateFormatter = new Intl.DateTimeFormat('en-US', {
 			month: 'long', day: 'numeric', year: 'numeric'
@@ -116,9 +152,26 @@
 			return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(new Date(d + 'T12:00:00'));
 		}
 
+		function aqiCategory(v) {
+			if (v <= 50)  return ['Good', '#4ade80'];
+			if (v <= 100) return ['Moderate', '#facc15'];
+			if (v <= 150) return ['Sensitive Groups', '#fb923c'];
+			if (v <= 200) return ['Unhealthy', '#f87171'];
+			if (v <= 300) return ['Very Unhealthy', '#c084fc'];
+			return ['Hazardous', '#fb7185'];
+		}
+
+		function uvCategory(v) {
+			if (v <= 2)  return ['Low', '#4ade80'];
+			if (v <= 5)  return ['Moderate', '#facc15'];
+			if (v <= 7)  return ['High', '#fb923c'];
+			if (v <= 10) return ['Very High', '#f87171'];
+			return ['Extreme', '#c084fc'];
+		}
+
 		async function loadWeather() {
 			try {
-				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
+				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min,uv_index_max&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
 				const res = await fetch(url);
 				if (!res.ok) throw new Error();
 				const data = await res.json();
@@ -135,12 +188,35 @@
 					forecastRow.appendChild(cell);
 				});
 				weatherLabel.textContent = '5-Day Forecast · Anaheim, CA';
+				const uv = data.daily.uv_index_max[0];
+				if (uv != null) {
+					const [label, color] = uvCategory(uv);
+					uvValue.textContent = uv.toFixed(1);
+					uvValue.style.color = color;
+					uvDesc.textContent = label;
+				}
 			} catch {
 				weatherLabel.textContent = 'Forecast unavailable';
 			}
 		}
 
+		async function loadAirQuality() {
+			try {
+				const res = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=33.8121&longitude=-117.9190&current=us_aqi&timezone=America%2FLos_Angeles');
+				if (!res.ok) throw new Error();
+				const data = await res.json();
+				const aqi = data.current.us_aqi;
+				const [label, color] = aqiCategory(aqi);
+				aqiValue.textContent = aqi;
+				aqiValue.style.color = color;
+				aqiDesc.textContent = label;
+			} catch {
+				aqiDesc.textContent = 'Unavailable';
+			}
+		}
+
 		loadWeather();
+		loadAirQuality();
 	</script>
 </body>
 </html>
