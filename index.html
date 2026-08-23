@@ -3,92 +3,94 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Disneyland Resort Date & Weather</title>
+	<title>Disneyland Resort Dashboard</title>
 	<style>
-		* { box-sizing: border-box; }
-		body {
-			margin: 0;
-			font-family: Arial, Helvetica, sans-serif;
-			background: #0f172a;
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body { overflow: hidden; font-family: Arial, Helvetica, sans-serif; }
+
+		#dashboardFrame {
+			position: fixed;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			border: none;
+			z-index: 1;
+		}
+
+		.overlay {
+			position: fixed;
+			bottom: 20px;
+			left: 20px;
+			z-index: 2;
+			background: rgba(15, 23, 42, 0.88);
+			border: 1px solid rgba(255,255,255,0.14);
+			border-radius: 16px;
+			padding: 16px 20px;
 			color: #e5e7eb;
-			padding: 20px;
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			min-width: 300px;
+			max-width: 360px;
 		}
-		.app {
-			max-width: 980px;
-			margin: 0 auto;
-			background: rgba(17, 24, 39, 0.95);
-			border: 1px solid rgba(255,255,255,0.12);
-			border-radius: 18px;
-			padding: 24px;
-			box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+
+		.location { font-size: 0.95rem; font-weight: 700; }
+		.sublocation { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
+
+		.datetime {
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: 1px solid rgba(255,255,255,0.1);
 		}
-		.header {
-			display: flex;
-			justify-content: space-between;
-			gap: 16px;
-			flex-wrap: wrap;
-			align-items: end;
-			margin-bottom: 20px;
+		.date-value { font-size: 0.82rem; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; }
+		.time-value { font-size: 2rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.15; margin-top: 2px; }
+
+		.weather {
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: 1px solid rgba(255,255,255,0.1);
 		}
-		h1 { margin: 0; font-size: 1.5rem; }
-		.sub, .status { color: #94a3b8; margin: 6px 0 0; }
-		.date-box {
-			min-width: 250px;
+		.weather-label { font-size: 0.72rem; color: #94a3b8; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+		.forecast-row { display: flex; gap: 6px; }
+		.fc-day {
+			flex: 1;
+			background: rgba(255,255,255,0.06);
+			border-radius: 8px;
+			padding: 6px 4px;
 			text-align: center;
-			padding: 16px 18px;
-			border-radius: 14px;
-			background: rgba(56,189,248,0.12);
-			border: 1px solid rgba(56,189,248,0.25);
 		}
-		.date-label { color: #94a3b8; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
-		.date-value { margin-top: 8px; font-size: clamp(1.1rem, 2vw, 1.6rem); font-weight: 700; }
-		.time-value { margin-top: 6px; font-size: clamp(2rem, 3.6vw, 2.7rem); font-weight: 600; color: #e5e7eb; letter-spacing: 0.04em; }
-		.section-title { margin: 24px 0 12px; font-size: 1.1rem; }
-		.forecast-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-			gap: 12px;
-		}
-		.day-card {
-			background: #1f2937;
-			border: 1px solid rgba(255,255,255,0.12);
-			border-radius: 14px;
-			padding: 16px;
-			min-height: 150px;
-		}
-		.day-name { font-weight: 700; margin-bottom: 8px; }
-		.icon { font-size: 1.8rem; line-height: 1; }
-		.temps { margin-top: 10px; font-weight: 700; font-size: 1.05rem; }
-		.details { margin-top: 8px; color: #94a3b8; font-size: 0.92rem; line-height: 1.35; }
-		.footer-note { margin-top: 16px; color: #94a3b8; font-size: 0.85rem; }
-		@media (max-width: 640px) { .app { padding: 18px; } .date-box { width: 100%; } }
+		.fc-name { font-size: 0.72rem; font-weight: 700; color: #cbd5e1; }
+		.fc-icon { font-size: 1.1rem; line-height: 1.5; }
+		.fc-temps { font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
 	</style>
 </head>
 <body>
-	<main class="app" aria-label="Date and weather app">
-		<div class="header">
-			<div>
-				<h1>Disneyland Resort</h1>
-				<p class="sub">Anaheim, California</p>
-				<p class="status" id="status">Loading forecast…</p>
-			</div>
-            <div class="time-value" id="timeDisplay">--:--:-- --</div>
-			<div class="date-box" aria-live="polite">
-				<div class="date-label">Today</div>
-				<div class="date-value" id="dateDisplay">Loading date…</div>
-			</div>
+	<iframe
+		id="dashboardFrame"
+		src="https://app.smartsheet.com/b/publish?EQBCT=bf89d82cf784445eaf0a2122ace52019"
+		title="Smartsheet Dashboard"
+		allowfullscreen
+	></iframe>
+
+	<aside class="overlay" aria-label="Date, time and weather">
+		<div class="location">Disneyland Resort</div>
+		<div class="sublocation">Anaheim, California</div>
+
+		<div class="datetime" aria-live="polite">
+			<div class="date-value" id="dateDisplay">Loading…</div>
+			<div class="time-value" id="timeDisplay">--:--:-- --</div>
 		</div>
 
-		<h2 class="section-title">5-Day Weather Forecast</h2>
-		<div class="forecast-grid" id="forecastGrid"></div>
-
-	</main>
+		<div class="weather">
+			<div class="weather-label" id="weatherLabel">Loading forecast…</div>
+			<div class="forecast-row" id="forecastRow"></div>
+		</div>
+	</aside>
 
 	<script>
 		const dateDisplay = document.getElementById('dateDisplay');
 		const timeDisplay = document.getElementById('timeDisplay');
-		const forecastGrid = document.getElementById('forecastGrid');
-		const statusEl = document.getElementById('status');
+		const forecastRow  = document.getElementById('forecastRow');
+		const weatherLabel = document.getElementById('weatherLabel');
 
 		const dateFormatter = new Intl.DateTimeFormat('en-US', {
 			weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
@@ -96,61 +98,47 @@
 		const timeFormatter = new Intl.DateTimeFormat('en-US', {
 			hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
 		});
-		dateDisplay.textContent = dateFormatter.format(new Date()).toUpperCase();
 
-		function updateTime() {
-			timeDisplay.textContent = timeFormatter.format(new Date());
-		}
+		dateDisplay.textContent = dateFormatter.format(new Date()).toUpperCase();
+		function updateTime() { timeDisplay.textContent = timeFormatter.format(new Date()); }
 		updateTime();
 		setInterval(updateTime, 1000);
 
 		const weatherCodeMap = {
-			0: ['☀️', 'Clear sky'], 1: ['🌤️', 'Mainly clear'], 2: ['⛅', 'Partly cloudy'], 3: ['☁️', 'Overcast'],
-			45: ['🌫️', 'Fog'], 48: ['🌫️', 'Depositing rime fog'], 51: ['🌦️', 'Light drizzle'], 53: ['🌦️', 'Drizzle'],
-			55: ['🌧️', 'Dense drizzle'], 61: ['🌧️', 'Slight rain'], 63: ['🌧️', 'Rain'], 65: ['🌧️', 'Heavy rain'],
-			71: ['🌨️', 'Slight snow'], 73: ['🌨️', 'Snow'], 75: ['❄️', 'Heavy snow'], 80: ['🌦️', 'Rain showers'],
-			81: ['🌧️', 'Rain showers'], 82: ['🌧️', 'Violent rain showers'], 95: ['⛈️', 'Thunderstorm'],
-			96: ['⛈️', 'Thunderstorm with hail'], 99: ['⛈️', 'Thunderstorm with hail']
+			0: ['☀️', 'Clear'], 1: ['🌤️', 'Mainly clear'], 2: ['⛅', 'Partly cloudy'], 3: ['☁️', 'Overcast'],
+			45: ['🌫️', 'Fog'], 48: ['🌫️', 'Rime fog'], 51: ['🌦️', 'Lt drizzle'], 53: ['🌦️', 'Drizzle'],
+			55: ['🌧️', 'Drizzle'], 61: ['🌧️', 'Lt rain'], 63: ['🌧️', 'Rain'], 65: ['🌧️', 'Hvy rain'],
+			71: ['🌨️', 'Lt snow'], 73: ['🌨️', 'Snow'], 75: ['❄️', 'Hvy snow'], 80: ['🌦️', 'Showers'],
+			81: ['🌧️', 'Showers'], 82: ['🌧️', 'Hvy showers'], 95: ['⛈️', 'Thunderstorm'],
+			96: ['⛈️', 'T-storm+hail'], 99: ['⛈️', 'T-storm+hail']
 		};
 
-		function dayLabel(dateString) {
-			return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(new Date(dateString));
-		}
-
-		function renderForecast(days) {
-			forecastGrid.innerHTML = '';
-			days.forEach(day => {
-				const [icon, description] = weatherCodeMap[day.weathercode] || ['🌡️', 'Weather'];
-				const card = document.createElement('article');
-				card.className = 'day-card';
-				card.innerHTML = `
-					<div class="day-name">${dayLabel(day.date)}</div>
-					<div class="icon" aria-hidden="true">${icon}</div>
-					<div class="temps">${Math.round(day.temperature_2m_max)}° / ${Math.round(day.temperature_2m_min)}°F</div>
-					<div class="details">${description}<br>Precipitation: ${day.precipitation_probability_max ?? 'N/A'}%</div>
-				`;
-				forecastGrid.appendChild(card);
-			});
+		// Append T12:00:00 to avoid UTC midnight shifting the day label
+		function dayLabel(d) {
+			return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(new Date(d + 'T12:00:00'));
 		}
 
 		async function loadWeather() {
 			try {
-				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
-				const response = await fetch(url);
-				if (!response.ok) throw new Error('Weather request failed');
-				const data = await response.json();
-				const days = data.daily.time.map((date, index) => ({
-					date,
-					weathercode: data.daily.weathercode[index],
-					temperature_2m_max: data.daily.temperature_2m_max[index],
-					temperature_2m_min: data.daily.temperature_2m_min[index],
-					precipitation_probability_max: data.daily.precipitation_probability_max?.[index]
-				}));
-				renderForecast(days);
-				statusEl.textContent = 'Live forecast loaded.';
-			} catch (error) {
-				statusEl.textContent = 'Forecast unavailable right now.';
-				forecastGrid.innerHTML = '<article class="day-card"><div class="day-name">Error</div><div class="details">Unable to load weather data.</div></article>';
+				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
+				const res = await fetch(url);
+				if (!res.ok) throw new Error();
+				const data = await res.json();
+				forecastRow.innerHTML = '';
+				data.daily.time.forEach((date, i) => {
+					const [icon] = weatherCodeMap[data.daily.weathercode[i]] || ['🌡️'];
+					const cell = document.createElement('div');
+					cell.className = 'fc-day';
+					cell.innerHTML = `
+						<div class="fc-name">${dayLabel(date)}</div>
+						<div class="fc-icon">${icon}</div>
+						<div class="fc-temps">${Math.round(data.daily.temperature_2m_max[i])}°/${Math.round(data.daily.temperature_2m_min[i])}°</div>
+					`;
+					forecastRow.appendChild(cell);
+				});
+				weatherLabel.textContent = '5-Day Forecast · Anaheim, CA';
+			} catch {
+				weatherLabel.textContent = 'Forecast unavailable';
 			}
 		}
 
