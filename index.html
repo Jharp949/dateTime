@@ -25,21 +25,18 @@
 			background: rgba(15, 23, 42, 0.88);
 			border: 1px solid rgba(255,255,255,0.14);
 			border-radius: 14px;
-			padding: 10px 14px;
+			padding: 8px 14px;
 			color: #e5e7eb;
 			backdrop-filter: blur(10px);
 			-webkit-backdrop-filter: blur(10px);
-			min-width: 280px;
-			max-width: 340px;
+			min-width: 380px;
+			max-width: 440px;
 		}
 
-		.location { font-size: 0.95rem; font-weight: 700; }
-		.sublocation { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
-
 		.datetime {
-			margin-top: 6px;
-			padding-top: 6px;
-			border-top: 1px solid rgba(255,255,255,0.1);
+			margin-top: 0;
+			padding-top: 0;
+			border-top: none;
 		}
 		.date-value { font-size: 0.78rem; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; }
 		.time-value { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.15; margin-top: 2px; }
@@ -72,8 +69,6 @@
 	></iframe>
 
 	<aside class="overlay" aria-label="Date, time and weather">
-		<div class="location">Disneyland Resort</div>
-		<div class="sublocation">Anaheim, California</div>
 
 		<div class="datetime" aria-live="polite">
 			<div class="date-value" id="dateDisplay">Loading…</div>
