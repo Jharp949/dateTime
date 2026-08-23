@@ -171,7 +171,7 @@
 
 		async function loadWeather() {
 			try {
-				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min,uv_index_max&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
+				const url = 'https://api.open-meteo.com/v1/forecast?latitude=33.8121&longitude=-117.9190&daily=weathercode,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&forecast_days=5';
 				const res = await fetch(url);
 				if (!res.ok) throw new Error();
 				const data = await res.json();
@@ -188,13 +188,6 @@
 					forecastRow.appendChild(cell);
 				});
 				weatherLabel.textContent = '5-Day Forecast · Anaheim, CA';
-				const uv = data.daily.uv_index_max[0];
-				if (uv != null) {
-					const [label, color] = uvCategory(uv);
-					uvValue.textContent = uv.toFixed(1);
-					uvValue.style.color = color;
-					uvDesc.textContent = label;
-				}
 			} catch {
 				weatherLabel.textContent = 'Forecast unavailable';
 			}
@@ -202,14 +195,21 @@
 
 		async function loadAirQuality() {
 			try {
-				const res = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=33.8121&longitude=-117.9190&current=us_aqi&timezone=America%2FLos_Angeles');
+				const res = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=33.8121&longitude=-117.9190&current=us_aqi,uv_index&timezone=America%2FLos_Angeles');
 				if (!res.ok) throw new Error();
 				const data = await res.json();
 				const aqi = data.current.us_aqi;
-				const [label, color] = aqiCategory(aqi);
+				const [aqiLabel, aqiColor] = aqiCategory(aqi);
 				aqiValue.textContent = aqi;
-				aqiValue.style.color = color;
-				aqiDesc.textContent = label;
+				aqiValue.style.color = aqiColor;
+				aqiDesc.textContent = aqiLabel;
+				const uv = data.current.uv_index;
+				if (uv != null) {
+					const [uvLabel, uvColor] = uvCategory(uv);
+					uvValue.textContent = uv.toFixed(1);
+					uvValue.style.color = uvColor;
+					uvDesc.textContent = uvLabel;
+				}
 			} catch {
 				aqiDesc.textContent = 'Unavailable';
 			}
@@ -217,6 +217,7 @@
 
 		loadWeather();
 		loadAirQuality();
+		setInterval(() => { loadWeather(); loadAirQuality(); }, 15 * 60 * 1000);
 	</script>
 </body>
 </html>
